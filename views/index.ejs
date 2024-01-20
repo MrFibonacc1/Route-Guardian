@@ -6,6 +6,8 @@
     <title>Document</title>
 </head>
 <body>  
-    <h1>Hello World</h1>
+    <% for (let i = 0; i < locations.length; i++) { %>
+        <p>Latitude: <%= locations[i].latitude %>, Longitude: <%= locations[i].longitude %></p>
+    <% } %>
 </body>
 </html>
