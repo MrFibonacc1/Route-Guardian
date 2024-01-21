@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "export OPENAI_API_KEY='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'; node app.js"
+    "start": "export OPENAI_API_KEY='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'; node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
