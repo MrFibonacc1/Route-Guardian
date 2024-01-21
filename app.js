@@ -1,6 +1,9 @@
 const express = require("express");
 const app = express();
+const bodyParser = require('body-parser');
 
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(express.static("public"));
 
 app.set("view engine", "ejs");
@@ -62,7 +65,12 @@ const getData = async () => {
 
 app.get("/", async (req, res) => {
   const data = await getData();
-  console.log(data);
+  res.render("index", { locations: data });
+});
+
+app.post("/directions", async (req, res) => {
+  console.log(req.body);
+  const data = await getData();
   res.render("index", { locations: data });
 });
 
