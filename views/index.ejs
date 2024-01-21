@@ -3,19 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Route Risk Analysis</title>
+    <link rel="icon" href="images/icon.png">
     <link rel="stylesheet" href="css/map.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   </head>
   <body>
     <nav class="navbar fixed-top bg-body-tertiary">
-      <div class="container-fluid">
-        <form class="d-flex" role="search">
+      <div class="container-fluid" style="display: flex; justify-content: space-between;">
+        <form class="d-flex dest-input" role="search">
           <input id="from" class="form-control me-2" type="input" placeholder="From" aria-label="Search" style="width: 40vh;">
           <input id="dest" class="form-control me-2" type="input" placeholder="Destination" aria-label="Search" style="width: 40vh;">
         </form>
-        <button type="button" class="btn btn-success" id="submit">Submit</button>
+        <div>
+          <button type="button" class="btn btn-danger" id="clear">Clear</button>
+          <button type="button" class="btn btn-success" id="submit">Submit</button>
+        </div>
       </div>
     </nav>
       
@@ -26,6 +30,8 @@
       const locations = <%- JSON.stringify(locations) %>;
     </script>
 
+    <script src="js/mapActionListeners.js"></script>
+    <script src="js/mapFunctions.js"></script>
     <script src="js/map.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBQ7IBAuMfj-a8ftZVKzz7znGbo8LK2ij8&libraries=places&callback=initMap" async defer></script>
   </body>

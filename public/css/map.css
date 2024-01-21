@@ -3,7 +3,31 @@ input {
 }
 
 #map {
-    height: 100vh;
+    height: 94vh;
     width: 100%;
     padding: 0;
+    position: absolute;
+    bottom: 0;
 }  
+
+@media (max-width: 768px) {
+    input {
+        width: 90%;
+    }
+
+    .dest-input {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    #map {
+        height: 90vh;
+    }
+}
+
+@media (max-width: 500px) {
+    #map {
+        height: 85vh;
+    }
+}
