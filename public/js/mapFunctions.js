@@ -47,9 +47,11 @@ const convertTime = (time24) => {
   return time12;
 };
 
-const setMarkers = (locations, map, flag) => {
+const setMarkers = (locations, map, isRoute) => {
   const markers = [];
   for (let i = 0; i < locations.length; i++) {
+    let flag = (locations[i].count > 90) ? 'red' : 'yellow';
+    flag = isRoute ? 'blue' : flag;
     let markerOptions = {
       position: new google.maps.LatLng(locations[i].latitude, locations[i].longitude),
       icon: {
@@ -61,7 +63,10 @@ const setMarkers = (locations, map, flag) => {
     const numberOfAccidents = locations[i].count;
     const time = locations[i].time == "Non précisé" ? "N/A" : convertTime(locations[i].time);
     const weather = locations[i].weather.charAt(0).toUpperCase() + locations[i].weather.slice(1);
-    const contentString = '<div id="content">' + '<div id="siteNotice">' + "</div>" + '<div id="bodyContent" style="text-align: center;">' + "<p>Time of Accident: " + time + "</p>" + "<p>Number of Accidents: " + numberOfAccidents + "</p>" + "<p>Weather during Accident: " + weather + "</p>" + "</div>" + "</div>";
+    let aiMessage = locations[i].aiReply;
+    if (aiMessage != '') aiMessage = '<p>AI Advice: ' + aiMessage + '</p>';
+
+    const contentString = '<div id="content">' + '<div id="siteNotice">' + "</div>" + '<div id="bodyContent" style="text-align: center;">' + "<p>Time of Accident: " + time + "</p>" + "<p>Number of Accidents: " + numberOfAccidents + "</p>" + "<p>Weather during Accident: " + weather + "</p>" + aiMessage + "</div>" + "</div>";
 
     const infowindow = new google.maps.InfoWindow({
       content: contentString,

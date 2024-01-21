@@ -1,6 +1,10 @@
-const express = require("express");
+import OpenAI from "openai";
+import express from "express";
+import bodyParser from "body-parser";
+import fetch from "node-fetch"; // Add this import
+
+const openai = new OpenAI();
 const app = express();
-const bodyParser = require("body-parser");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -120,7 +124,6 @@ const getData = async () => {
         });
       }
     }
-    console.log(highOccurrenceLocations)
     return highOccurrenceLocations;
   }
 };
@@ -130,4 +133,53 @@ app.get("/", async (req, res) => {
   res.render("index", { locations: data });
 });
 
-app.listen(process.env.PORT || 3000);
+app.get("/ai", async (req, res) => {
+  const data = await getData();
+
+  for (let i = 0; i < data.length; i++) {
+    const accident = data[i];
+    const { time, weather, severities } = accident;
+
+    const severityArray = Object.entries(severities).map(([severity, count]) => `${count} ${severity}`);
+
+    const query = `Car accident happened at ${time} when the weather was ${weather} and the accidents that occurred were ${severityArray.join(", ")}`;
+    try {
+      if (data[i].count > 90) {
+        const reply = await aiCall(query);
+
+        data[i].aiReply = reply;
+      }
+    } catch (error) {
+      console.error("Error making AI call:", error.message);
+    }
+  }
+
+  res.render("index", { locations: data });
+});
+
+async function aiCall(query) {
+  let retries = 3;
+  let delay = 1000;
+
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const completion = await openai.chat.completions.create({
+        messages: [{ role: "system", content: `Given this info, translate to english and give me 1 advice on how to prevent an accident given the cause of the accidents in under 10 words: ${query}` }],
+        model: "gpt-3.5-turbo",
+      });
+
+      return completion.choices[0].message.content;
+      break;
+    } catch (error) {
+      if (error.response && error.response.status === 429) {
+        console.log(`Rate limit exceeded. Retrying after ${delay / 1000} seconds (attempt ${attempt}/${retries})...`);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        delay *= 2;
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+app.listen(process.env.PORT || 4000);

@@ -12,7 +12,7 @@ function initMap() {
   });
 
   // add crash POIs onto map
-  markers = setMarkers(locations, map, 'yellow');
+  markers = setMarkers(locations, map, false);
 
   // setup route with map
   const directionsService = new google.maps.DirectionsService();
@@ -49,6 +49,6 @@ function initMap() {
 
     const pointsBetween = calculatePointsBetween(fromLatitude, fromLongitude, destLatitude, destLongitude, 100);
     const newLocations = findPointsWithinDistance(pointsBetween, locations, 0.002);
-    markers = setMarkers(newLocations, map, 'red');
+    markers = setMarkers(newLocations, map, true);
   });
 }
