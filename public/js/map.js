@@ -1,3 +1,6 @@
+let markers = [];
+const submit = document.getElementById('submit');
+
 function initMap() {
   const styles = [
     { featureType: "all", elementType: "labels.icon", stylers: [{ visibility: "off" }] },
@@ -22,6 +25,7 @@ function initMap() {
     }
   
     let marker = new google.maps.Marker(markerOptions);
+    markers.push(marker);
     marker.setMap(map);
   }
 
@@ -42,7 +46,8 @@ function initMap() {
 
   const form = document.getElementById("directions");
 
-  form.addEventListener("submit", (event) => {
+  // filters out data for user entered route
+  submit.addEventListener("click", (event) => {
     const fromLatitude = originAutocomplete.getPlace().geometry.location.lat();
     const fromLongitude = originAutocomplete.getPlace().geometry.location.lng();
     const destLatitude = destinationAutocomplete.getPlace().geometry.location.lat();
@@ -51,25 +56,25 @@ function initMap() {
     const data = {from: {latitude: fromLatitude, longitude: fromLongitude}, dest: {latitude: destLatitude, longitude: destLongitude}};
 
     calculateAndDisplayRoute(directionsService, directionsRenderer);
-
-    fetch('/directions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    })
-    .then(response => response.json())
-    .then(data => {
-      console.log('Success:', data);
-      // Handle success, if needed
-    })
-    .catch(error => {
-      console.error('Error:', error);
-      // Handle error, if needed
-    });
+    for (let i = 0; i < markers.length; i++){
+      markers[i].setMap(null);
+    }
     
-    
+    const pointsBetween = calculatePointsBetween(fromLatitude, fromLongitude, destLatitude, destLongitude, 100);
+    const newLocations = findPointsWithinDistance(pointsBetween, locations, 0.002);
+    markers = [];
+    for (let i = 0; i < newLocations.length; i++){
+      let markerOptions = {
+        position: new google.maps.LatLng(newLocations[i].latitude, newLocations[i].longitude),
+        icon: {
+          url: "./images/flag-red.png",
+          scaledSize: new google.maps.Size(32, 32) // sets the size to 50x50 pixels
+        }
+      }
+      let marker = new google.maps.Marker(markerOptions);
+      markers.push(marker);
+      marker.setMap(map);
+    }
   });
 
   // function for getting route on map
@@ -91,10 +96,46 @@ function initMap() {
         directionsRenderer.setDirections(response);
       }
     );
-  }
+  } 
 }
 
+// calculates points between start and end locations
+function calculatePointsBetween(startLat, startLon, endLat, endLon, numPoints) {
+  const points = [];
 
+  for (let i = 0; i <= numPoints; i++) {
+      const f = i / numPoints;
+      const lat = startLat + f * (endLat - startLat);
+      const lon = startLon + f * (endLon - startLon);
+
+      points.push({ latitude: lat, longitude: lon });
+  }
+
+  return points;
+}
+
+function findPointsWithinDistance(set1, set2, distance) {
+  const result = [];
+
+  for (let i = 0; i < set1.length; i++) {
+      const point1 = set1[i];
+
+      for (let j = 0; j < set2.length; j++) {
+          const point2 = set2[j];
+
+          const latDiff = Math.abs(point1.latitude - point2.latitude);
+          const lonDiff = Math.abs(point1.longitude - point2.longitude);
+
+          const actualDistance = Math.sqrt(latDiff ** 2 + lonDiff ** 2);
+
+          if (actualDistance <= distance) {
+              result.push(point2);
+          }
+      }
+  }
+
+  return result;
+}
 
 
 
