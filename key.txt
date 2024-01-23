@@ -1,3 +1,3 @@
-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
+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
 
-export OPENAI_API_KEY='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'
+export OPENAI_API_KEY='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'
